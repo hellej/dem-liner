@@ -3,12 +3,15 @@ import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import dynamic from "next/dynamic";
 
-const Map = dynamic(() => import("@/components/Map").then((mod) => mod.Map), {
-  loading: () => <div>Loading map...</div>,
-  ssr: false,
-});
+const MapApp = dynamic(
+  () => import("@/components/MapApp").then((mod) => mod.MapApp),
+  {
+    loading: () => <div>Loading map...</div>,
+    ssr: false,
+  }
+);
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], weight: "300" });
 
 export default function Home() {
   return (
@@ -19,8 +22,8 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <Map />
+      <main className={`${inter.className} ${styles.main}`}>
+        <MapApp />
       </main>
     </>
   );
