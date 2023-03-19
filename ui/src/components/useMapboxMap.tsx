@@ -1,4 +1,10 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import mapboxgl, { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -14,25 +20,45 @@ export enum MapboxBasemap {
   SATELLITE = "mapbox://styles/mapbox/satellite-v9",
 }
 
-export const useMapboxMap = (): {
-  map: Map | null;
-  mapContainer: MutableRefObject<HTMLDivElement>;
-} => {
-  const mapContainer = useRef<HTMLDivElement | null>(null);
-  const mapObject = useRef<null | mapboxgl.Map>(null);
+const useMapReady = (map: Map | null): boolean => {
+  const [isReady, setIsReady] = useState(false);
+  const setReady = useCallback(() => setIsReady(true), []);
 
   useEffect(() => {
-    if (mapObject.current) return;
-    mapObject.current = new mapboxgl.Map({
-      container: mapContainer.current as HTMLDivElement,
-      style: MapboxBasemap.SATELLITE,
-      center: [24.820204, 60.189515],
-      zoom: 12,
-    });
+    map?.on("load", setReady);
+    return () => {
+      map?.off("load", setReady);
+    };
+  }, [map, setReady]);
+
+  return isReady;
+};
+
+const createMap = (container: HTMLDivElement): Map => {
+  return new mapboxgl.Map({
+    container,
+    style: MapboxBasemap.SATELLITE,
+    center: [24.820204, 60.189515],
+    zoom: 12,
   });
+};
+
+export const useMapboxMap = (
+  mapContainer: MutableRefObject<HTMLDivElement | null>
+): {
+  map: Map | null;
+} => {
+  const [map, setMap] = useState<null | mapboxgl.Map>(null);
+  const initialized = useRef<boolean>(false);
+  const mapIsReady = useMapReady(map);
+
+  useEffect(() => {
+    if (initialized.current || !mapContainer.current) return;
+    initialized.current = true;
+    setMap(createMap(mapContainer.current));
+  }, [map, mapContainer]);
 
   return {
-    map: mapObject.current,
-    mapContainer: mapContainer as MutableRefObject<HTMLDivElement>,
+    map: mapIsReady ? map : null,
   };
 };
