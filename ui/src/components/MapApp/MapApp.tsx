@@ -6,13 +6,19 @@ import styles from "./MapApp.module.css";
 export const MapApp = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const { map } = useMapboxMap(mapContainer);
-  const layerLoaded = useDEMPointsLayer(map);
+  const { isLoaded: isLayerLoaded, getRenderedDEMPointFC } =
+    useDEMPointsLayer(map);
+
+  const handleGetRenderedDEMPointFC = () => {
+    const fc = getRenderedDEMPointFC && getRenderedDEMPointFC();
+  };
 
   return (
     <div className={styles["map-app-container"]}>
       <div className={styles["map-container"]} ref={mapContainer} />
       <div className={styles["map-overlay-container"]}>
-        {!layerLoaded && "Loading layer..."}
+        {!isLayerLoaded && "Loading layer..."}
+        <button onClick={handleGetRenderedDEMPointFC}>Query DEM point</button>
       </div>
     </div>
   );

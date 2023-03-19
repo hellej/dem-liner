@@ -1,6 +1,9 @@
 import { useDoOnce } from "@/hooks";
-import mapboxgl, { Map } from "mapbox-gl";
-import { useEffect, useRef } from "react";
+import { Map } from "mapbox-gl";
+import {
+  DEMPointFC,
+  useGetRenderedDEMPointFC,
+} from "./useGetRenderedDEMPointFC";
 
 const layerURL = "mapbox://joose.8a3p02oc";
 const sourceLayerId = "points-al0av9";
@@ -34,6 +37,14 @@ const useAddLayerToMap = (map: Map | null): boolean => {
   return sourceAdded && layerAdded;
 };
 
-export const useDEMPointsLayer = (map: Map | null): boolean => {
-  return useAddLayerToMap(map);
+export const useDEMPointsLayer = (
+  map: Map | null
+): {
+  isLoaded: boolean;
+  getRenderedDEMPointFC: (() => DEMPointFC) | undefined;
+} => {
+  const isLoaded = useAddLayerToMap(map);
+  const getRenderedDEMPointFC = useGetRenderedDEMPointFC(map, layerId);
+
+  return { isLoaded, getRenderedDEMPointFC };
 };
