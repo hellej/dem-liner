@@ -31,11 +31,12 @@ const filterOutDuplicatePoints = (
 const mapFeatureAsDEMPointFeature = (
   feat: MapboxGeoJSONFeature
 ): DEMPointFeature | undefined => {
-  if (!feat.properties?.elev) return undefined;
+  const elev = feat.properties?.elev;
+  if (!elev || typeof elev !== "number") return undefined;
   return {
     type: "Feature",
     geometry: feat.geometry as Point,
-    properties: { elev: feat.properties.elev },
+    properties: { elev: +elev.toFixed(4) },
   };
 };
 

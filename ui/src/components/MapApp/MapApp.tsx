@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import { useDEMPointsLayer } from "../DEMPointsLayer/useDEMPointsLayer";
+import { useDEMPointsLayer } from "../DEMPointsLayer";
+import { useDEMIsolineLayer } from "../DEMIsolineLayer";
 import { useMapboxMap } from "../useMapboxMap";
 import styles from "./MapApp.module.css";
 
@@ -9,8 +10,11 @@ export const MapApp = () => {
   const { isLoaded: isLayerLoaded, getRenderedDEMPointFC } =
     useDEMPointsLayer(map);
 
+  const { updateDEMIsolines } = useDEMIsolineLayer(map);
+
   const handleGetRenderedDEMPointFC = () => {
-    const fc = getRenderedDEMPointFC && getRenderedDEMPointFC();
+    if (!getRenderedDEMPointFC) return;
+    updateDEMIsolines(getRenderedDEMPointFC());
   };
 
   return (
