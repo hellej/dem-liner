@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.4.1",
+    "@turf/distance": "^6.5.0",
+    "@turf/isolines": "^6.5.0",
+    "@turf/length": "^6.5.0",
     "@types/node": "18.15.3",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
