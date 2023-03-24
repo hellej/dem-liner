@@ -10,8 +10,8 @@ export type DEMIsolineFC = FeatureCollection<MultiLineString>;
 
 const layerId = "dem-isolines";
 
-const getDEMIsolines = (fc: DEMPointFC): DEMIsolineFC => {
-  const breaks = [0.5, 1, 2, 3];
+const getDEMIsolines = (fc: DEMPointFC, breakVal: number): DEMIsolineFC => {
+  const breaks = [breakVal];
   return isolines(fc, breaks, { zProperty: "elev" });
 };
 
@@ -71,7 +71,14 @@ export const useDEMIsolineLayer = (
     }) as DEMPointFC;
     console.log("pointGrid points ", pointGrid.features.length);
 
-    const isolineFC = getDEMIsolines(pointGrid);
+    const meanHeight =
+      pointGrid.features
+        .map((f) => f.properties.elev)
+        .reduce((prev, curr) => prev + curr, 0) / pointGrid.features.length;
+
+    console.log("meanHeight", meanHeight);
+
+    const isolineFC = getDEMIsolines(pointGrid, meanHeight);
 
     console.log("isolineFC", isolineFC);
     createOrUpdateMapLayer(isolineFC);

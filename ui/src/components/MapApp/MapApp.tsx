@@ -3,6 +3,7 @@ import { useDEMPointsLayer } from "../DEMPointsLayer";
 import { useDEMIsolineLayer } from "../DEMIsolineLayer";
 import { useMapboxMap } from "../useMapboxMap";
 import styles from "./MapApp.module.css";
+import { ThresholdSlider } from "../ThresholdSlider/ThresholdSlider";
 
 export const MapApp = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
@@ -23,6 +24,7 @@ export const MapApp = () => {
       <div className={styles["map-overlay-container"]}>
         {!isLayerLoaded && "Loading layer..."}
         <button onClick={handleGetRenderedDEMPointFC}>Query DEM point</button>
+        <ThresholdSlider />
       </div>
     </div>
   );
