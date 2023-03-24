@@ -12,24 +12,33 @@ const Input = styled(MuiInput)`
   color: white;
 `;
 
-export const ThresholdSlider = () => {
-  const [value, setValue] = React.useState<
-    number | string | Array<number | string>
-  >(30);
+export const defaultThreshold = 5;
+const min = 0;
+const max = 30;
 
-  const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    setValue(newValue);
+export const ThresholdSlider = (props: {
+  threshold: number;
+  setThreshold: (val: number) => void;
+}) => {
+  const handleSliderChange = (_: Event, newValue: number | number[]) => {
+    if (!Array.isArray(newValue)) {
+      props.setThreshold(newValue);
+    }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value === "" ? "" : Number(event.target.value));
+    const newValue =
+      event.target.value === "" ? "" : Number(event.target.value);
+    if (typeof newValue === "number") {
+      props.setThreshold(newValue);
+    }
   };
 
   const handleBlur = () => {
-    if (value < 0) {
-      setValue(0);
-    } else if (value > 100) {
-      setValue(100);
+    if (props.threshold < min) {
+      props.setThreshold(min);
+    } else if (props.threshold > max) {
+      props.setThreshold(max);
     }
   };
 
@@ -42,7 +51,7 @@ export const ThresholdSlider = () => {
         <Grid container spacing={2} alignItems="center">
           <Grid item xs>
             <Slider
-              value={typeof value === "number" ? value : 0}
+              value={props.threshold}
               onChange={handleSliderChange}
               aria-labelledby="input-slider"
               min={0}
@@ -52,7 +61,7 @@ export const ThresholdSlider = () => {
           <Grid item>
             <Input
               style={{ width: 55 }}
-              value={value}
+              value={props.threshold}
               size="small"
               onChange={handleInputChange}
               onBlur={handleBlur}

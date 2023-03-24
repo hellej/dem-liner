@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useDEMPointsLayer } from "../DEMPointsLayer";
 import { useDEMIsolineLayer } from "../DEMIsolineLayer";
 import { useMapboxMap } from "../useMapboxMap";
@@ -7,24 +7,16 @@ import { ThresholdSlider } from "../ThresholdSlider/ThresholdSlider";
 
 export const MapApp = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
+  const [threshold, setThreshold] = useState(5);
   const { map } = useMapboxMap(mapContainer);
-  const { isLoaded: isLayerLoaded, getRenderedDEMPointFC } =
-    useDEMPointsLayer(map);
-
-  const { updateDEMIsolines } = useDEMIsolineLayer(map);
-
-  const handleGetRenderedDEMPointFC = () => {
-    if (!getRenderedDEMPointFC) return;
-    updateDEMIsolines(getRenderedDEMPointFC());
-  };
+  const { isLoaded: isLayerLoaded } = useDEMPointsLayer(map);
 
   return (
     <div className={styles["map-app-container"]}>
       <div className={styles["map-container"]} ref={mapContainer} />
       <div className={styles["map-overlay-container"]}>
         {!isLayerLoaded && "Loading layer..."}
-        <button onClick={handleGetRenderedDEMPointFC}>Query DEM point</button>
-        <ThresholdSlider />
+        <ThresholdSlider threshold={threshold} setThreshold={setThreshold} />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useDoOnce } from "@/hooks";
 import { Map } from "mapbox-gl";
+import { useEffect, useState } from "react";
 import {
   DEMPointFC,
   useGetRenderedDEMPointFC,
@@ -9,6 +10,27 @@ const layerURL = "mapbox://joose.8a3p02oc";
 const sourceLayerId = "points-al0av9";
 
 const layerId = "dem-points";
+
+const useDEMPointFCOfCurrentExtent = (map: Map | null): DEMPointFC | null => {
+  const [renderedDEMPointFC, setRenderedDEMPointFC] =
+    useState<DEMPointFC | null>(null);
+  const getRenderedDEMPointFC = useGetRenderedDEMPointFC(map, layerId);
+
+  const updateRenderedDEMPointFC = () => {
+    setRenderedDEMPointFC(
+      getRenderedDEMPointFC ? getRenderedDEMPointFC() : null
+    );
+  };
+
+  useEffect(() => {
+    map?.on("moovend", updateRenderedDEMPointFC);
+    return () => {
+      map?.off("moovend", updateRenderedDEMPointFC);
+    };
+  });
+
+  return renderedDEMPointFC;
+};
 
 const addSource = (map: Map) => {
   map.addSource(layerId, {
