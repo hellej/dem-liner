@@ -50,9 +50,9 @@ const addLayer = (map: Map) => {
       "circle-color": "white",
       "circle-opacity": [
         "case",
-        ["boolean", ["feature-state", "isVisible"], true],
-        0.4,
-        0.05,
+        ["boolean", ["feature-state", "isVisible"], false],
+        0.8,
+        0,
       ],
     },
   });
@@ -64,21 +64,32 @@ const useAddLayerToMap = (map: Map | null): boolean => {
   return sourceAdded && layerAdded;
 };
 
-const useUpdateStyleByThreshold = (
-  map: Map | null,
-  threshold: number,
-  demPointFC: DEMPointFC | null
-) => {
+const useUpdateStyleByThreshold = (map: Map | null, threshold: number) => {
+  const demPointFC = useDEMPointFCOfCurrentExtent(map);
+
   useEffect(() => {
     if (!demPointFC || !map) return;
 
     demPointFC.features.forEach((f) => {
       map.setFeatureState(
         { id: f.id, source: layerId, sourceLayer: sourceLayerId },
-        { isVisible: f.properties.elev > threshold }
+        { isVisible: f.properties.elev <= threshold }
       );
     });
   }, [map, threshold, demPointFC]);
+};
+
+const useClearFeatureStatesOnMoveend = (map: Map | null) => {
+  const clearFeatureStates = useCallback(() => {
+    map?.removeFeatureState({ source: layerId, sourceLayer: sourceLayerId });
+  }, [map]);
+
+  useEffect(() => {
+    map?.on("moveend", clearFeatureStates);
+    return () => {
+      map?.off("moveend", clearFeatureStates);
+    };
+  });
 };
 
 export const useDEMPointsLayer = (
@@ -89,10 +100,12 @@ export const useDEMPointsLayer = (
   getRenderedDEMPointFC: (() => DEMPointFC) | undefined;
 } => {
   const isLoaded = useAddLayerToMap(map);
-  const getRenderedDEMPointFC = useGetRenderedDEMPointFC(map, layerId);
-  const demPointFC = useDEMPointFCOfCurrentExtent(map);
 
-  useUpdateStyleByThreshold(map, threshold, demPointFC);
+  useClearFeatureStatesOnMoveend(map);
+  useUpdateStyleByThreshold(map, threshold);
 
-  return { isLoaded, getRenderedDEMPointFC };
+  return {
+    isLoaded,
+    getRenderedDEMPointFC: useGetRenderedDEMPointFC(map, layerId),
+  };
 };

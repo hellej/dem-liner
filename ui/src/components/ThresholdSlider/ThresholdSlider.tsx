@@ -43,7 +43,7 @@ export const ThresholdSlider = (props: {
 
   return (
     <div className={styles["slider-panel"]}>
-      <Box sx={{ width: 250 }}>
+      <Box sx={{ width: 550 }}>
         <Typography id="input-slider" gutterBottom>
           Elevation
         </Typography>
@@ -54,7 +54,8 @@ export const ThresholdSlider = (props: {
               onChange={handleSliderChange}
               aria-labelledby="input-slider"
               min={0}
-              max={30}
+              max={20}
+              step={0.1}
             />
           </Grid>
           <Grid item>
@@ -65,7 +66,7 @@ export const ThresholdSlider = (props: {
               onChange={handleInputChange}
               onBlur={handleBlur}
               inputProps={{
-                step: 0.1,
+                step: 0.02,
                 min: 0,
                 max: 30,
                 type: "number",
