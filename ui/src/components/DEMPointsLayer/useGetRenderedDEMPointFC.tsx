@@ -5,7 +5,10 @@ export interface DEMPointProperties {
   elev: number;
 }
 
-export type DEMPointFeature = Feature<Point, DEMPointProperties>;
+export type DEMPointFeature = Feature<Point, DEMPointProperties> & {
+  id: number;
+};
+
 export type DEMPointFC = FeatureCollection<Point, DEMPointProperties>;
 
 const isNotUndefined = <T,>(v: T | undefined): v is T => v !== undefined;
@@ -33,10 +36,12 @@ const mapFeatureAsDEMPointFeature = (
 ): DEMPointFeature | undefined => {
   const elev = feat.properties?.elev;
   if (!elev || typeof elev !== "number") return undefined;
+  if (typeof feat.id !== "number") return undefined;
   return {
     type: "Feature",
     geometry: feat.geometry as Point,
     properties: { elev: +elev.toFixed(4) },
+    id: feat.id,
   };
 };
 
@@ -52,6 +57,7 @@ export const useGetRenderedDEMPointFC = (
         layers: [layerId],
       })
     );
+
     return {
       type: "FeatureCollection",
       features: mapFeatures

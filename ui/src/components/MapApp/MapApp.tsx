@@ -9,7 +9,7 @@ export const MapApp = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const [threshold, setThreshold] = useState(5);
   const { map } = useMapboxMap(mapContainer);
-  const { isLoaded: isLayerLoaded } = useDEMPointsLayer(map);
+  const { isLoaded: isLayerLoaded } = useDEMPointsLayer(map, threshold);
 
   return (
     <div className={styles["map-app-container"]}>

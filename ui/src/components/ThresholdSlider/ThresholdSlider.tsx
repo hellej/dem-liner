@@ -12,7 +12,6 @@ const Input = styled(MuiInput)`
   color: white;
 `;
 
-export const defaultThreshold = 5;
 const min = 0;
 const max = 30;
 

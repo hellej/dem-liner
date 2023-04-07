@@ -1,6 +1,6 @@
 import { useDoOnce } from "@/hooks";
 import { Map } from "mapbox-gl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   DEMPointFC,
   useGetRenderedDEMPointFC,
@@ -23,9 +23,9 @@ const useDEMPointFCOfCurrentExtent = (map: Map | null): DEMPointFC | null => {
   };
 
   useEffect(() => {
-    map?.on("moovend", updateRenderedDEMPointFC);
+    map?.on("moveend", updateRenderedDEMPointFC);
     return () => {
-      map?.off("moovend", updateRenderedDEMPointFC);
+      map?.off("moveend", updateRenderedDEMPointFC);
     };
   });
 
@@ -48,7 +48,12 @@ const addLayer = (map: Map) => {
     paint: {
       "circle-radius": 1.2,
       "circle-color": "white",
-      "circle-opacity": 0.5,
+      "circle-opacity": [
+        "case",
+        ["boolean", ["feature-state", "isVisible"], true],
+        0.4,
+        0.05,
+      ],
     },
   });
 };
@@ -59,14 +64,35 @@ const useAddLayerToMap = (map: Map | null): boolean => {
   return sourceAdded && layerAdded;
 };
 
+const useUpdateStyleByThreshold = (
+  map: Map | null,
+  threshold: number,
+  demPointFC: DEMPointFC | null
+) => {
+  useEffect(() => {
+    if (!demPointFC || !map) return;
+
+    demPointFC.features.forEach((f) => {
+      map.setFeatureState(
+        { id: f.id, source: layerId, sourceLayer: sourceLayerId },
+        { isVisible: f.properties.elev > threshold }
+      );
+    });
+  }, [map, threshold, demPointFC]);
+};
+
 export const useDEMPointsLayer = (
-  map: Map | null
+  map: Map | null,
+  threshold: number
 ): {
   isLoaded: boolean;
   getRenderedDEMPointFC: (() => DEMPointFC) | undefined;
 } => {
   const isLoaded = useAddLayerToMap(map);
   const getRenderedDEMPointFC = useGetRenderedDEMPointFC(map, layerId);
+  const demPointFC = useDEMPointFCOfCurrentExtent(map);
+
+  useUpdateStyleByThreshold(map, threshold, demPointFC);
 
   return { isLoaded, getRenderedDEMPointFC };
 };
