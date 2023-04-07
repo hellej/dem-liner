@@ -6,8 +6,8 @@ import {
   useGetRenderedDEMPointFC,
 } from "./useGetRenderedDEMPointFC";
 
-const layerURL = "mapbox://joose.8a3p02oc";
-const sourceLayerId = "points-al0av9";
+const layerURL = "mapbox://joose.2rotad4x";
+const sourceLayerId = "points-2u14rd";
 
 const layerId = "dem-points";
 
@@ -36,6 +36,7 @@ const addSource = (map: Map) => {
   map.addSource(layerId, {
     type: "vector",
     url: layerURL,
+    promoteId: { original: "id" },
   });
 };
 
@@ -70,6 +71,8 @@ const useUpdateStyleByThreshold = (map: Map | null, threshold: number) => {
   useEffect(() => {
     if (!demPointFC || !map) return;
 
+    map?.removeFeatureState({ source: layerId, sourceLayer: sourceLayerId });
+
     demPointFC.features.forEach((f) => {
       map.setFeatureState(
         { id: f.id, source: layerId, sourceLayer: sourceLayerId },
@@ -77,19 +80,6 @@ const useUpdateStyleByThreshold = (map: Map | null, threshold: number) => {
       );
     });
   }, [map, threshold, demPointFC]);
-};
-
-const useClearFeatureStatesOnMoveend = (map: Map | null) => {
-  const clearFeatureStates = useCallback(() => {
-    map?.removeFeatureState({ source: layerId, sourceLayer: sourceLayerId });
-  }, [map]);
-
-  useEffect(() => {
-    map?.on("moveend", clearFeatureStates);
-    return () => {
-      map?.off("moveend", clearFeatureStates);
-    };
-  });
 };
 
 export const useDEMPointsLayer = (
@@ -101,7 +91,6 @@ export const useDEMPointsLayer = (
 } => {
   const isLoaded = useAddLayerToMap(map);
 
-  useClearFeatureStatesOnMoveend(map);
   useUpdateStyleByThreshold(map, threshold);
 
   return {

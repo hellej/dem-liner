@@ -23,7 +23,7 @@ const filterOutDuplicatePoints = (
   const uniqueFeatures = [];
 
   for (const feature of features) {
-    const id = pointGeomAsStringIdentifier(feature.geometry as Point);
+    const id = feature.id;
     if (geomIdentifiers.has(id)) continue;
     geomIdentifiers.add(id);
     uniqueFeatures.push(feature);
@@ -40,7 +40,7 @@ const mapFeatureAsDEMPointFeature = (
   return {
     type: "Feature",
     geometry: feat.geometry as Point,
-    properties: { elev: +elev.toFixed(4) },
+    properties: { elev },
     id: feat.id,
   };
 };
@@ -52,11 +52,9 @@ export const useGetRenderedDEMPointFC = (
   if (!map) return undefined;
 
   return () => {
-    const mapFeatures = filterOutDuplicatePoints(
-      map.queryRenderedFeatures(undefined, {
-        layers: [layerId],
-      })
-    );
+    const mapFeatures = map.queryRenderedFeatures(undefined, {
+      layers: [layerId],
+    });
 
     return {
       type: "FeatureCollection",
