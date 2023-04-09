@@ -16,10 +16,18 @@ const useDEMPointFCOfCurrentExtent = (map: Map | null): DEMPointFC | null => {
     useState<DEMPointFC | null>(null);
   const getRenderedDEMPointFC = useGetRenderedDEMPointFC(map, layerId);
 
-  const updateRenderedDEMPointFC = () => {
-    setRenderedDEMPointFC(
-      getRenderedDEMPointFC ? getRenderedDEMPointFC() : null
-    );
+  let delayedUpdate: undefined | ReturnType<typeof setTimeout> = undefined;
+
+  const updateRenderedDEMPointFC = (e: any) => {
+    if (delayedUpdate) {
+      clearTimeout(delayedUpdate);
+    }
+    delayedUpdate = setTimeout(() => {
+      console.log("updating FC of current extent", e);
+      setRenderedDEMPointFC(
+        getRenderedDEMPointFC ? getRenderedDEMPointFC() : null
+      );
+    }, 2000);
   };
 
   useEffect(() => {
@@ -82,6 +90,29 @@ const useUpdateStyleByThreshold = (map: Map | null, threshold: number) => {
   }, [map, threshold, demPointFC]);
 };
 
+const useDebugClickedFeature = (map: Map | null) => {
+  const handleClick = useCallback(
+    (e: any) => {
+      const bbox = [
+        [e.point.x - 3, e.point.y - 3],
+        [e.point.x + 3, e.point.y + 3],
+      ];
+      const selectedFeatures = map?.queryRenderedFeatures(bbox as any, {
+        layers: [layerId],
+      });
+      console.log("clicked features", selectedFeatures);
+    },
+    [map]
+  );
+
+  useEffect(() => {
+    map?.on("click", handleClick);
+    return () => {
+      map?.off("click", handleClick);
+    };
+  });
+};
+
 export const useDEMPointsLayer = (
   map: Map | null,
   threshold: number
@@ -91,6 +122,7 @@ export const useDEMPointsLayer = (
 } => {
   const isLoaded = useAddLayerToMap(map);
 
+  useDebugClickedFeature(map);
   useUpdateStyleByThreshold(map, threshold);
 
   return {
