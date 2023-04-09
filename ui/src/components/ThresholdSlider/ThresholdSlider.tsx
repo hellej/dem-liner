@@ -5,7 +5,6 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Slider from "@mui/material/Slider";
 import MuiInput from "@mui/material/Input";
-import styles from "./ThresholdSlider.module.css";
 
 const Input = styled(MuiInput)`
   width: 42px;
@@ -42,40 +41,38 @@ export const ThresholdSlider = (props: {
   };
 
   return (
-    <div className={styles["slider-panel"]}>
-      <Box sx={{ width: 550 }}>
-        <Typography id="input-slider" gutterBottom>
-          Elevation
-        </Typography>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs>
-            <Slider
-              value={props.threshold}
-              onChange={handleSliderChange}
-              aria-labelledby="input-slider"
-              min={0}
-              max={20}
-              step={0.1}
-            />
-          </Grid>
-          <Grid item>
-            <Input
-              style={{ width: 55 }}
-              value={props.threshold}
-              size="small"
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              inputProps={{
-                step: 0.02,
-                min: 0,
-                max: 30,
-                type: "number",
-                "aria-labelledby": "input-slider",
-              }}
-            />
-          </Grid>
+    <Box sx={{ width: 550 }}>
+      <Typography id="input-slider" gutterBottom>
+        Elevation
+      </Typography>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs>
+          <Slider
+            value={props.threshold}
+            onChange={handleSliderChange}
+            aria-labelledby="input-slider"
+            min={0}
+            max={20}
+            step={0.1}
+          />
         </Grid>
-      </Box>
-    </div>
+        <Grid item>
+          <Input
+            style={{ width: 55 }}
+            value={props.threshold}
+            size="small"
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            inputProps={{
+              step: 0.02,
+              min: 0,
+              max: 30,
+              type: "number",
+              "aria-labelledby": "input-slider",
+            }}
+          />
+        </Grid>
+      </Grid>
+    </Box>
   );
 };

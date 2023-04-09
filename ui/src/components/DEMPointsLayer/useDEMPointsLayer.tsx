@@ -22,6 +22,9 @@ const useDEMPointFCOfCurrentExtent = (map: Map | null): DEMPointFC | null => {
     if (delayedUpdate) {
       clearTimeout(delayedUpdate);
     }
+    setRenderedDEMPointFC(
+      getRenderedDEMPointFC ? getRenderedDEMPointFC() : null
+    );
     delayedUpdate = setTimeout(() => {
       console.log("updating FC of current extent", e);
       setRenderedDEMPointFC(
@@ -73,9 +76,11 @@ const useAddLayerToMap = (map: Map | null): boolean => {
   return sourceAdded && layerAdded;
 };
 
-const useUpdateStyleByThreshold = (map: Map | null, threshold: number) => {
-  const demPointFC = useDEMPointFCOfCurrentExtent(map);
-
+const useUpdateStyleByThreshold = (
+  map: Map | null,
+  threshold: number,
+  demPointFC: DEMPointFC | null
+) => {
   useEffect(() => {
     if (!demPointFC || !map) return;
 
@@ -118,15 +123,16 @@ export const useDEMPointsLayer = (
   threshold: number
 ): {
   isLoaded: boolean;
-  getRenderedDEMPointFC: (() => DEMPointFC) | undefined;
+  demPointFC: DEMPointFC | null;
 } => {
   const isLoaded = useAddLayerToMap(map);
+  const demPointFC = useDEMPointFCOfCurrentExtent(map);
 
   useDebugClickedFeature(map);
-  useUpdateStyleByThreshold(map, threshold);
+  useUpdateStyleByThreshold(map, threshold, demPointFC);
 
   return {
     isLoaded,
-    getRenderedDEMPointFC: useGetRenderedDEMPointFC(map, layerId),
+    demPointFC,
   };
 };

@@ -18,3 +18,11 @@
   width: 100%;
   flex: 1;
 }
+
+.slider-panel {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 13px 20px 9px 20px;
+  border-radius: 5px;
+  width: max-content;
+  color: white;
+}

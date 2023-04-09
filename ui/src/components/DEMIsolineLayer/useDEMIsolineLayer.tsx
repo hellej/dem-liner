@@ -54,31 +54,19 @@ const useCreateOrUpdateMapLayer = (map: Map | null) => {
 
 export const useDEMIsolineLayer = (
   map: Map | null
-): { updateDEMIsolines: (fc: DEMPointFC) => void } => {
+): { updateDEMIsolines: (fc: DEMPointFC, threshold: number) => void } => {
   const createOrUpdateMapLayer = useCreateOrUpdateMapLayer(map);
 
-  const updateDEMIsolines = (pointFC: DEMPointFC) => {
-    console.log("original points ", pointFC.features.length);
-    console.log(
-      "some heights:",
-      pointFC.features.slice(10, 20).map((f) => f.properties.elev)
-    );
-
+  const updateDEMIsolines = (pointFC: DEMPointFC, threshold: number) => {
     const pointGrid = interpolate(pointFC, 2, {
       gridType: "point",
       property: "elev",
       units: "meters",
     }) as DEMPointFC;
-    console.log("pointGrid points ", pointGrid.features.length);
 
-    const meanHeight =
-      pointGrid.features
-        .map((f) => f.properties.elev)
-        .reduce((prev, curr) => prev + curr, 0) / pointGrid.features.length;
+    console.log("pointGrid", pointGrid);
 
-    console.log("meanHeight", meanHeight);
-
-    const isolineFC = getDEMIsolines(pointGrid, meanHeight);
+    const isolineFC = getDEMIsolines(pointGrid, threshold);
 
     console.log("isolineFC", isolineFC);
     createOrUpdateMapLayer(isolineFC);
